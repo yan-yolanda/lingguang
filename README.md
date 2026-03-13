@@ -1,2 +1,2 @@
-# lingguang
-lingguang web from codebuddy
+# 灵光
+一个使用codebuddy氛围编程的产物
