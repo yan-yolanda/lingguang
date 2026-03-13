@@ -1,0 +1,1534 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>灵光 · 创意记录</title>
+  <style>
+    /* ===== Reset & Base ===== */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #fafaf8;
+      --surface: #ffffff;
+      --surface-2: #f4f3ef;
+      --border: #e8e6df;
+      --text: #1a1917;
+      --text-2: #6b6860;
+      --text-3: #9c9a94;
+      --accent: #e86c3a;
+      --accent-light: #fdf0ea;
+      --works: #3a7be8;
+      --works-light: #eaf0fd;
+      --tag-bg: #f0efe9;
+      --radius: 12px;
+      --radius-sm: 8px;
+      --shadow: 0 1px 4px rgba(0,0,0,.06), 0 4px 16px rgba(0,0,0,.04);
+      --shadow-hover: 0 2px 8px rgba(0,0,0,.08), 0 8px 24px rgba(0,0,0,.06);
+      --transition: .18s ease;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Hiragino Sans GB",
+                   "Microsoft YaHei", sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      font-size: 15px;
+      line-height: 1.6;
+    }
+
+    /* ===== Layout ===== */
+    .app { display: flex; flex-direction: column; min-height: 100vh; }
+
+    header {
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(250,250,248,.92);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      padding: 0 24px;
+      height: 56px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+
+    .logo {
+      font-size: 18px; font-weight: 700; letter-spacing: -.3px;
+      color: var(--text);
+      display: flex; align-items: center; gap: 8px;
+    }
+    .logo-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); }
+
+    .header-actions { display: flex; align-items: center; gap: 8px; }
+
+    .main-content {
+      flex: 1;
+      max-width: 900px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 32px 24px 80px;
+    }
+
+    /* ===== Tabs ===== */
+    .tabs {
+      display: flex; gap: 4px;
+      background: var(--surface-2);
+      border-radius: 10px;
+      padding: 4px;
+      margin-bottom: 28px;
+      width: fit-content;
+    }
+    .tab-btn {
+      padding: 7px 20px;
+      border: none; background: none;
+      border-radius: 8px;
+      font-size: 14px; font-weight: 500;
+      color: var(--text-2);
+      cursor: pointer;
+      transition: all var(--transition);
+      display: flex; align-items: center; gap: 6px;
+    }
+    .tab-btn .count {
+      font-size: 11px; background: var(--border);
+      color: var(--text-3); border-radius: 10px;
+      padding: 1px 7px; font-weight: 600;
+      transition: all var(--transition);
+    }
+    .tab-btn.active {
+      background: var(--surface);
+      color: var(--text);
+      box-shadow: 0 1px 3px rgba(0,0,0,.08);
+    }
+    .tab-btn.active.ideas-tab .count { background: var(--accent-light); color: var(--accent); }
+    .tab-btn.active.works-tab .count { background: var(--works-light); color: var(--works); }
+
+    /* ===== Search & Filter ===== */
+    .toolbar {
+      display: flex; gap: 10px; margin-bottom: 20px;
+      flex-wrap: wrap; align-items: center;
+    }
+    .search-box {
+      flex: 1; min-width: 200px;
+      position: relative;
+    }
+    .search-box input {
+      width: 100%;
+      padding: 9px 12px 9px 36px;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-sm);
+      background: var(--surface);
+      font-size: 14px; color: var(--text);
+      outline: none;
+      transition: border-color var(--transition);
+    }
+    .search-box input:focus { border-color: var(--accent); }
+    .search-box input::placeholder { color: var(--text-3); }
+    .search-icon {
+      position: absolute; left: 11px; top: 50%; transform: translateY(-50%);
+      color: var(--text-3); pointer-events: none; font-size: 15px;
+    }
+    .filter-tags {
+      display: flex; gap: 6px; flex-wrap: wrap;
+    }
+    .filter-tag {
+      padding: 5px 12px; border-radius: 20px;
+      border: 1.5px solid var(--border);
+      background: var(--surface);
+      font-size: 13px; color: var(--text-2);
+      cursor: pointer; transition: all var(--transition);
+    }
+    .filter-tag:hover { border-color: var(--accent); color: var(--accent); }
+    .filter-tag.active { border-color: var(--accent); background: var(--accent-light); color: var(--accent); font-weight: 500; }
+
+    /* ===== Quick Add ===== */
+    .quick-add {
+      background: var(--surface);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px;
+      margin-bottom: 24px;
+      box-shadow: var(--shadow);
+    }
+    .quick-add-title {
+      font-size: 13px; font-weight: 600;
+      color: var(--accent); letter-spacing: .3px;
+      margin-bottom: 14px;
+      display: flex; align-items: center; gap: 6px;
+    }
+    .quick-add-title::before {
+      content: '⚡'; font-size: 14px;
+    }
+    .qa-inputs { display: flex; flex-direction: column; gap: 10px; }
+    .qa-inputs input, .qa-inputs textarea {
+      width: 100%;
+      padding: 10px 14px;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-sm);
+      background: var(--bg);
+      font-size: 14px; color: var(--text);
+      outline: none; font-family: inherit;
+      transition: border-color var(--transition);
+      resize: none;
+    }
+    .qa-inputs input:focus, .qa-inputs textarea:focus { border-color: var(--accent); background: var(--surface); }
+    .qa-inputs input::placeholder, .qa-inputs textarea::placeholder { color: var(--text-3); }
+    .qa-inputs textarea { min-height: 80px; line-height: 1.6; }
+    .qa-row { display: flex; gap: 10px; align-items: center; }
+    .qa-row input { flex: 1; }
+    .tag-input-wrap { position: relative; flex: 1; }
+    .tag-input-wrap input { width: 100%; }
+    .qa-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 4px; }
+
+    /* ===== Buttons ===== */
+    .btn {
+      padding: 9px 20px; border-radius: var(--radius-sm);
+      border: none; cursor: pointer; font-size: 14px;
+      font-weight: 500; font-family: inherit;
+      transition: all var(--transition); display: inline-flex;
+      align-items: center; gap: 6px;
+    }
+    .btn-primary {
+      background: var(--accent); color: #fff;
+    }
+    .btn-primary:hover { background: #d45e2c; }
+    .btn-ghost {
+      background: none; color: var(--text-2);
+      border: 1.5px solid var(--border);
+    }
+    .btn-ghost:hover { border-color: var(--text-2); color: var(--text); }
+    .btn-sm { padding: 6px 14px; font-size: 13px; }
+    .btn-works {
+      background: var(--works); color: #fff;
+    }
+    .btn-works:hover { background: #2e6cd4; }
+    .btn-icon {
+      width: 34px; height: 34px; padding: 0;
+      display: flex; align-items: center; justify-content: center;
+      border-radius: var(--radius-sm); font-size: 16px;
+    }
+
+    /* ===== Card Grid ===== */
+    .cards-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 14px;
+    }
+
+    .idea-card {
+      background: var(--surface);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius);
+      padding: 18px;
+      cursor: pointer;
+      transition: all var(--transition);
+      box-shadow: var(--shadow);
+      display: flex; flex-direction: column; gap: 10px;
+      position: relative; overflow: hidden;
+    }
+    .idea-card::before {
+      content: '';
+      position: absolute; left: 0; top: 0; bottom: 0;
+      width: 3px; background: var(--accent);
+      border-radius: 3px 0 0 3px;
+      opacity: 0; transition: opacity var(--transition);
+    }
+    .idea-card:hover { box-shadow: var(--shadow-hover); transform: translateY(-1px); border-color: #dbd9d2; }
+    .idea-card:hover::before { opacity: 1; }
+    .idea-card.converted::before { background: var(--works); opacity: .4; }
+
+    .card-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; }
+    .card-title { font-size: 15px; font-weight: 600; color: var(--text); line-height: 1.4; flex: 1; }
+    .card-badge {
+      font-size: 11px; font-weight: 600; padding: 2px 8px;
+      border-radius: 10px; white-space: nowrap; flex-shrink: 0;
+    }
+    .badge-idea { background: var(--accent-light); color: var(--accent); }
+    .badge-converted { background: var(--works-light); color: var(--works); }
+
+    .card-content {
+      font-size: 13px; color: var(--text-2); line-height: 1.6;
+      display: -webkit-box; -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical; overflow: hidden;
+    }
+    .card-footer {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-top: auto;
+    }
+    .card-meta { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+    .card-date { font-size: 12px; color: var(--text-3); }
+    .card-tag {
+      font-size: 11px; padding: 2px 8px;
+      background: var(--tag-bg); color: var(--text-2);
+      border-radius: 10px;
+    }
+    .card-stats {
+      display: flex; gap: 10px;
+    }
+    .card-stat {
+      font-size: 12px; color: var(--text-3);
+      display: flex; align-items: center; gap: 3px;
+    }
+
+    /* Work card variant */
+    .work-card { border-color: #dce8fb; }
+    .work-card::before { background: var(--works); }
+    .work-card:hover { border-color: #c4d8f9; }
+
+    /* ===== Empty State ===== */
+    .empty-state {
+      text-align: center; padding: 60px 20px;
+      color: var(--text-3);
+    }
+    .empty-icon { font-size: 48px; margin-bottom: 16px; opacity: .5; }
+    .empty-title { font-size: 16px; font-weight: 500; color: var(--text-2); margin-bottom: 8px; }
+    .empty-desc { font-size: 14px; line-height: 1.6; }
+
+    /* ===== Modal ===== */
+    .modal-overlay {
+      position: fixed; inset: 0; z-index: 200;
+      background: rgba(0,0,0,.35);
+      backdrop-filter: blur(4px);
+      display: flex; align-items: flex-start; justify-content: center;
+      padding: 40px 20px;
+      opacity: 0; pointer-events: none;
+      transition: opacity .2s ease;
+      overflow-y: auto;
+    }
+    .modal-overlay.open { opacity: 1; pointer-events: all; }
+
+    .modal {
+      background: var(--surface);
+      border-radius: 16px;
+      width: 100%; max-width: 680px;
+      box-shadow: 0 8px 40px rgba(0,0,0,.15);
+      transform: translateY(12px);
+      transition: transform .2s ease;
+      overflow: hidden;
+      flex-shrink: 0;
+    }
+    .modal-overlay.open .modal { transform: translateY(0); }
+
+    .modal-header {
+      padding: 24px 24px 0;
+      display: flex; justify-content: space-between; align-items: flex-start;
+    }
+    .modal-header-left { flex: 1; }
+    .modal-badge-row { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; flex-wrap: wrap; }
+    .modal-title { font-size: 20px; font-weight: 700; line-height: 1.35; color: var(--text); }
+    .modal-close {
+      width: 32px; height: 32px; border-radius: 8px;
+      border: none; background: var(--surface-2);
+      cursor: pointer; font-size: 16px; color: var(--text-2);
+      display: flex; align-items: center; justify-content: center;
+      transition: all var(--transition); flex-shrink: 0;
+      margin-left: 12px;
+    }
+    .modal-close:hover { background: var(--border); color: var(--text); }
+
+    .modal-body { padding: 20px 24px 24px; }
+    .modal-meta { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 18px; }
+    .meta-item { font-size: 13px; color: var(--text-3); display: flex; align-items: center; gap: 4px; }
+
+    .modal-section { margin-bottom: 24px; }
+    .modal-section:last-child { margin-bottom: 0; }
+    .section-label {
+      font-size: 12px; font-weight: 600; color: var(--text-3);
+      letter-spacing: .6px; text-transform: uppercase;
+      margin-bottom: 10px;
+      display: flex; align-items: center; gap: 6px;
+    }
+    .section-label::after {
+      content: ''; flex: 1; height: 1px; background: var(--border);
+    }
+    .idea-content-text {
+      font-size: 15px; color: var(--text); line-height: 1.75;
+      white-space: pre-wrap;
+    }
+
+    /* Journey */
+    .journey-list { display: flex; flex-direction: column; gap: 0; }
+    .journey-item {
+      display: flex; gap: 14px; padding: 14px 0;
+      border-bottom: 1px solid var(--border);
+      position: relative;
+    }
+    .journey-item:last-child { border-bottom: none; }
+    .journey-timeline {
+      display: flex; flex-direction: column; align-items: center;
+      width: 28px; flex-shrink: 0; padding-top: 2px;
+    }
+    .journey-dot {
+      width: 10px; height: 10px; border-radius: 50%;
+      background: var(--accent); border: 2px solid var(--surface);
+      box-shadow: 0 0 0 1.5px var(--accent);
+      flex-shrink: 0;
+    }
+    .journey-line {
+      width: 1.5px; flex: 1; background: var(--border);
+      margin-top: 4px;
+    }
+    .journey-item:last-child .journey-line { display: none; }
+    .journey-content { flex: 1; min-width: 0; }
+    .journey-header { display: flex; align-items: center; gap: 8px; margin-bottom: 5px; flex-wrap: wrap; }
+    .journey-emotion {
+      font-size: 18px; line-height: 1;
+    }
+    .journey-time { font-size: 12px; color: var(--text-3); }
+    .journey-text { font-size: 14px; color: var(--text); line-height: 1.65; white-space: pre-wrap; }
+    .journey-actions {
+      display: flex; gap: 4px; margin-left: auto; flex-shrink: 0;
+    }
+    .icon-btn {
+      width: 28px; height: 28px; border-radius: 6px;
+      border: none; background: none; cursor: pointer;
+      font-size: 13px; color: var(--text-3);
+      display: flex; align-items: center; justify-content: center;
+      transition: all var(--transition);
+    }
+    .icon-btn:hover { background: var(--surface-2); color: var(--text); }
+
+    .journey-add {
+      padding: 14px 0 0;
+    }
+    .journey-add textarea {
+      width: 100%; padding: 10px 14px;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-sm);
+      background: var(--bg); font-size: 14px; color: var(--text);
+      outline: none; font-family: inherit; resize: none;
+      line-height: 1.6; min-height: 72px;
+      transition: border-color var(--transition);
+    }
+    .journey-add textarea:focus { border-color: var(--accent); background: var(--surface); }
+    .journey-add textarea::placeholder { color: var(--text-3); }
+    .journey-add-row { display: flex; justify-content: space-between; align-items: center; margin-top: 8px; flex-wrap: wrap; gap: 8px; }
+    .emotion-picker { display: flex; gap: 4px; }
+    .emotion-btn {
+      width: 30px; height: 30px; border-radius: 6px; border: 1.5px solid transparent;
+      background: var(--surface-2); cursor: pointer; font-size: 16px;
+      display: flex; align-items: center; justify-content: center;
+      transition: all var(--transition);
+    }
+    .emotion-btn:hover { background: var(--border); }
+    .emotion-btn.selected { border-color: var(--accent); background: var(--accent-light); }
+
+    /* Convert to Work */
+    .convert-section {
+      background: var(--works-light);
+      border: 1.5px dashed #a8c4f5;
+      border-radius: var(--radius-sm);
+      padding: 16px; text-align: center;
+    }
+    .convert-section p {
+      font-size: 13px; color: var(--works); margin-bottom: 12px; font-weight: 500;
+    }
+    .work-detail-section {
+      background: var(--surface-2); border-radius: var(--radius-sm);
+      padding: 16px;
+    }
+    .work-detail-label { font-size: 12px; font-weight: 600; color: var(--text-3); margin-bottom: 6px; }
+    .work-detail-text { font-size: 14px; color: var(--text); line-height: 1.65; white-space: pre-wrap; }
+    .work-link {
+      display: inline-flex; align-items: center; gap: 4px;
+      font-size: 13px; color: var(--works); text-decoration: none;
+      padding: 3px 0;
+    }
+    .work-link:hover { text-decoration: underline; }
+
+    /* ===== Convert Modal ===== */
+    .convert-modal { max-width: 500px; }
+    .form-group { margin-bottom: 16px; }
+    .form-label { font-size: 13px; font-weight: 500; color: var(--text-2); margin-bottom: 6px; display: block; }
+    .form-input, .form-textarea {
+      width: 100%; padding: 10px 14px;
+      border: 1.5px solid var(--border); border-radius: var(--radius-sm);
+      background: var(--bg); font-size: 14px; color: var(--text);
+      outline: none; font-family: inherit;
+      transition: border-color var(--transition);
+    }
+    .form-input:focus, .form-textarea:focus { border-color: var(--works); background: var(--surface); }
+    .form-textarea { resize: vertical; min-height: 100px; line-height: 1.6; }
+
+    /* ===== Notification ===== */
+    .notification {
+      position: fixed; bottom: 24px; right: 24px; z-index: 300;
+      background: var(--text); color: #fff;
+      padding: 12px 18px; border-radius: var(--radius-sm);
+      font-size: 14px; font-weight: 500;
+      box-shadow: 0 4px 20px rgba(0,0,0,.2);
+      transform: translateY(80px); opacity: 0;
+      transition: all .3s cubic-bezier(.175,.885,.32,1.275);
+      pointer-events: none; max-width: 320px;
+    }
+    .notification.show { transform: translateY(0); opacity: 1; }
+    .notification.success { background: #2d7a4f; }
+    .notification.error { background: #c0392b; }
+
+    /* ===== Works Pool specific ===== */
+    .work-card .card-title { color: var(--works); }
+    .work-progress { margin-top: 4px; }
+    .progress-bar-bg {
+      height: 4px; background: var(--works-light);
+      border-radius: 2px; overflow: hidden;
+    }
+    .progress-bar-fill {
+      height: 100%; background: var(--works);
+      border-radius: 2px; transition: width .4s ease;
+    }
+    .progress-label { font-size: 11px; color: var(--works); margin-top: 4px; font-weight: 500; }
+
+    /* ===== Responsive ===== */
+    @media (max-width: 600px) {
+      .main-content { padding: 20px 14px 80px; }
+      header { padding: 0 14px; }
+      .cards-grid { grid-template-columns: 1fr; }
+      .modal-overlay { padding: 20px 12px; }
+    }
+
+    /* ===== FAB ===== */
+    .fab {
+      position: fixed; bottom: 28px; right: 28px; z-index: 150;
+      width: 52px; height: 52px; border-radius: 50%;
+      background: var(--accent); color: #fff;
+      border: none; cursor: pointer; font-size: 24px;
+      box-shadow: 0 4px 16px rgba(232,108,58,.4);
+      display: flex; align-items: center; justify-content: center;
+      transition: all var(--transition);
+    }
+    .fab:hover { background: #d45e2c; transform: scale(1.08); box-shadow: 0 6px 20px rgba(232,108,58,.5); }
+    .fab:active { transform: scale(.96); }
+
+    /* ===== Tag Dropdown ===== */
+    .tag-dropdown-wrap {
+      position: relative; flex: 1;
+    }
+    .tag-dropdown-wrap.inline { flex: 1; }
+    .tag-dropdown-input-row {
+      display: flex; align-items: center;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-sm);
+      background: var(--bg);
+      transition: border-color var(--transition), background var(--transition);
+      overflow: hidden;
+    }
+    .tag-dropdown-input-row:focus-within { border-color: var(--accent); background: var(--surface); }
+    .tag-dropdown-input-row input {
+      flex: 1; padding: 10px 14px;
+      border: none; background: none;
+      font-size: 14px; color: var(--text);
+      outline: none; font-family: inherit;
+      min-width: 0;
+    }
+    .tag-dropdown-input-row input::placeholder { color: var(--text-3); }
+    .tag-dropdown-arrow {
+      padding: 0 10px; color: var(--text-3); font-size: 11px;
+      cursor: pointer; user-select: none; flex-shrink: 0;
+      transition: color var(--transition);
+    }
+    .tag-dropdown-arrow:hover { color: var(--text); }
+    .tag-dropdown-panel {
+      position: absolute; top: calc(100% + 4px); left: 0; right: 0; z-index: 500;
+      background: var(--surface);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-sm);
+      box-shadow: var(--shadow-hover);
+      overflow: hidden;
+      display: none;
+    }
+    .tag-dropdown-panel.open { display: block; }
+    .tag-dropdown-list { max-height: 180px; overflow-y: auto; }
+    .tag-dropdown-item {
+      padding: 9px 14px; font-size: 14px; color: var(--text);
+      cursor: pointer; display: flex; align-items: center; justify-content: space-between;
+      transition: background var(--transition);
+    }
+    .tag-dropdown-item:hover { background: var(--surface-2); }
+    .tag-dropdown-item.selected { color: var(--accent); font-weight: 500; background: var(--accent-light); }
+    .tag-dropdown-item-del {
+      font-size: 12px; color: var(--text-3); padding: 2px 5px;
+      border-radius: 4px; border: none; background: none;
+      cursor: pointer; flex-shrink: 0; line-height: 1;
+      transition: all var(--transition);
+    }
+    .tag-dropdown-item-del:hover { background: #fdecea; color: #c0392b; }
+    .tag-dropdown-empty {
+      padding: 9px 14px; font-size: 13px; color: var(--text-3);
+    }
+    .tag-dropdown-create {
+      padding: 9px 14px; font-size: 13px; color: var(--accent);
+      cursor: pointer; border-top: 1px solid var(--border);
+      display: flex; align-items: center; gap: 6px;
+      transition: background var(--transition);
+    }
+    .tag-dropdown-create:hover { background: var(--accent-light); }
+    .tag-dropdown-create.hidden { display: none; }
+
+    /* ===== Tag colors ===== */
+    .tag-0 { background: #fdecea; color: #c0392b; }
+    .tag-1 { background: #fef9ea; color: #d4890a; }
+    .tag-2 { background: #eafdf0; color: #1f8a4c; }
+    .tag-3 { background: #eaf0fd; color: #3a7be8; }
+    .tag-4 { background: #f3eafd; color: #8e44ad; }
+    .tag-5 { background: #eafdfd; color: #1a9a9a; }
+
+    /* ===== Scrollbar ===== */
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: var(--text-3); }
+  </style>
+</head>
+<body>
+<div class="app">
+  <!-- Header -->
+  <header>
+    <div class="logo">
+      <div class="logo-dot"></div>
+      灵光
+    </div>
+    <div class="header-actions">
+      <button class="btn btn-primary btn-sm" id="openAddModal">+ 记录灵感</button>
+    </div>
+  </header>
+
+  <!-- Main -->
+  <main class="main-content">
+    <!-- Tabs -->
+    <div class="tabs">
+      <button class="tab-btn ideas-tab active" data-tab="ideas">
+        灵感池
+        <span class="count" id="ideasCount">0</span>
+      </button>
+      <button class="tab-btn works-tab" data-tab="works">
+        作品池
+        <span class="count" id="worksCount">0</span>
+      </button>
+    </div>
+
+    <!-- Ideas Panel -->
+    <div id="ideasPanel">
+      <!-- Quick Add -->
+      <div class="quick-add">
+        <div class="quick-add-title">30秒快速记录</div>
+        <div class="qa-inputs">
+          <input id="qaTitle" type="text" placeholder="灵感标题..." maxlength="80" />
+          <textarea id="qaContent" placeholder="具体描述这个想法..." rows="3"></textarea>
+          <div class="qa-row">
+            <div class="tag-dropdown-wrap inline" id="qaTagWrap">
+              <div class="tag-dropdown-input-row">
+                <input id="qaTag" type="text" placeholder="分类标签（可选）" maxlength="20" autocomplete="off" />
+                <span class="tag-dropdown-arrow" data-for="qaTagWrap">▾</span>
+              </div>
+              <div class="tag-dropdown-panel" id="qaTagPanel"></div>
+            </div>
+            <div class="qa-actions">
+              <button class="btn btn-ghost btn-sm" id="qaClear">清空</button>
+              <button class="btn btn-primary btn-sm" id="qaSave">⚡ 保存</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Toolbar -->
+      <div class="toolbar">
+        <div class="search-box">
+          <span class="search-icon">🔍</span>
+          <input type="text" id="searchInput" placeholder="搜索灵感..." />
+        </div>
+        <div class="filter-tags" id="filterTags">
+          <button class="filter-tag active" data-tag="all">全部</button>
+        </div>
+      </div>
+
+      <!-- Ideas Grid -->
+      <div class="cards-grid" id="ideasGrid"></div>
+    </div>
+
+    <!-- Works Panel -->
+    <div id="worksPanel" style="display:none">
+      <div class="toolbar">
+        <div class="search-box">
+          <span class="search-icon">🔍</span>
+          <input type="text" id="worksSearch" placeholder="搜索作品..." />
+        </div>
+      </div>
+      <div class="cards-grid" id="worksGrid"></div>
+    </div>
+  </main>
+</div>
+
+<!-- FAB (mobile) -->
+<button class="fab" id="fabBtn" title="快速记录">+</button>
+
+<!-- ===== Add/Edit Idea Modal ===== -->
+<div class="modal-overlay" id="addModal">
+  <div class="modal" style="max-width:560px">
+    <div class="modal-header">
+      <div class="modal-header-left">
+        <div class="modal-title" id="addModalTitle">记录新灵感</div>
+      </div>
+      <button class="modal-close" id="closeAddModal">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label class="form-label">灵感标题 *</label>
+        <input class="form-input" id="modalIdeaTitle" placeholder="一句话概括这个想法" maxlength="80" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">详细描述</label>
+        <textarea class="form-textarea" id="modalIdeaContent" placeholder="描述你的想法、背景、受到的启发..." rows="5"></textarea>
+      </div>
+      <div class="form-group">
+        <label class="form-label">分类标签</label>
+        <div class="tag-dropdown-wrap" id="modalTagWrap">
+          <div class="tag-dropdown-input-row">
+            <input class="form-input" id="modalIdeaTag" placeholder="选择或新建分类..." maxlength="20" autocomplete="off" style="border:none;background:none;padding:10px 14px;" />
+            <span class="tag-dropdown-arrow" data-for="modalTagWrap">▾</span>
+          </div>
+          <div class="tag-dropdown-panel" id="modalTagPanel"></div>
+        </div>
+      </div>
+      <div class="qa-actions" style="margin-top:4px">
+        <button class="btn btn-ghost" id="cancelAddModal">取消</button>
+        <button class="btn btn-primary" id="saveIdea">保存灵感</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== Idea Detail Modal ===== -->
+<div class="modal-overlay" id="detailModal">
+  <div class="modal" id="detailModalInner">
+    <div class="modal-header">
+      <div class="modal-header-left">
+        <div class="modal-badge-row" id="detailBadgeRow"></div>
+        <!-- 查看态：显示标题 -->
+        <div class="modal-title" id="detailTitle"></div>
+        <!-- 编辑态：标题输入框 -->
+        <input class="form-input" id="editTitleInput" placeholder="灵感标题" maxlength="80"
+          style="display:none; font-size:18px; font-weight:700; margin-top:2px;" />
+      </div>
+      <button class="modal-close" id="closeDetailModal">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="modal-meta" id="detailMeta"></div>
+
+      <!-- 查看态：内容 -->
+      <div class="modal-section" id="detailContentSection">
+        <div class="section-label">灵感内容</div>
+        <div class="idea-content-text" id="detailContent"></div>
+      </div>
+
+      <!-- 编辑态：内容+分类表单 -->
+      <div class="modal-section" id="detailEditSection" style="display:none">
+        <div class="section-label">编辑内容</div>
+        <div class="form-group" style="margin-bottom:12px">
+          <textarea class="form-textarea" id="editContentInput"
+            placeholder="描述你的想法、背景、受到的启发..." rows="5"></textarea>
+        </div>
+        <div class="form-group" style="margin-bottom:0">
+          <label class="form-label">分类标签</label>
+          <div class="tag-dropdown-wrap" id="detailTagWrap">
+            <div class="tag-dropdown-input-row">
+              <input id="editTagInput" placeholder="选择或新建分类..." maxlength="20" autocomplete="off"
+                style="flex:1;padding:10px 14px;border:none;background:none;font-size:14px;color:var(--text);outline:none;font-family:inherit;" />
+              <span class="tag-dropdown-arrow" data-for="detailTagWrap">▾</span>
+            </div>
+            <div class="tag-dropdown-panel" id="detailTagPanel"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Work Detail (if converted) -->
+      <div class="modal-section" id="workDetailSection" style="display:none">
+        <div class="section-label">作品详情</div>
+        <div class="work-detail-section" id="workDetailContent"></div>
+      </div>
+
+      <!-- Journey -->
+      <div class="modal-section" id="journeySection">
+        <div class="section-label">心路历程</div>
+        <div class="journey-list" id="journeyList"></div>
+        <div class="journey-add">
+          <textarea id="journeyInput" placeholder="记录此刻的进展、遇到的问题、或内心感受..."></textarea>
+          <div class="journey-add-row">
+            <div class="emotion-picker" id="emotionPicker">
+              <button class="emotion-btn" data-emotion="💡" title="有想法">💡</button>
+              <button class="emotion-btn" data-emotion="🔥" title="很兴奋">🔥</button>
+              <button class="emotion-btn" data-emotion="😤" title="遇到困难">😤</button>
+              <button class="emotion-btn" data-emotion="😌" title="平静">😌</button>
+              <button class="emotion-btn" data-emotion="🎉" title="里程碑">🎉</button>
+              <button class="emotion-btn" data-emotion="🤔" title="在思考">🤔</button>
+            </div>
+            <button class="btn btn-primary btn-sm" id="saveJourney">记录</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Convert / Work info -->
+      <div class="modal-section" id="convertSection">
+        <div class="section-label">转化为作品</div>
+        <div class="convert-section" id="convertArea">
+          <p>将这个灵感转化为实际作品，记录你的成果</p>
+          <button class="btn btn-works btn-sm" id="openConvertModal">✦ 转化为作品</button>
+        </div>
+      </div>
+
+      <!-- 底部操作栏 -->
+      <div style="display:flex; gap:8px; justify-content:flex-end; border-top:1px solid var(--border); padding-top:16px; margin-top:8px;">
+        <!-- 查看态按钮 -->
+        <div id="detailViewActions" style="display:flex;gap:8px;">
+          <button class="btn btn-ghost btn-sm" id="editIdeaBtn">编辑</button>
+          <button class="btn btn-ghost btn-sm" style="color:#c0392b; border-color:#f5c6c6;" id="deleteIdeaBtn">删除</button>
+        </div>
+        <!-- 编辑态按钮 -->
+        <div id="detailEditActions" style="display:none;gap:8px;">
+          <button class="btn btn-ghost btn-sm" id="cancelEditBtn">取消</button>
+          <button class="btn btn-primary btn-sm" id="saveEditBtn">保存修改</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== Convert Modal ===== -->
+<div class="modal-overlay" id="convertModal">
+  <div class="modal convert-modal">
+    <div class="modal-header">
+      <div class="modal-header-left">
+        <div class="modal-title">转化为作品</div>
+      </div>
+      <button class="modal-close" id="closeConvertModal">✕</button>
+    </div>
+    <div class="modal-body">
+      <p style="font-size:13px; color:var(--text-2); margin-bottom:16px;">记录你把灵感变成现实的成果</p>
+      <div class="form-group">
+        <label class="form-label">作品名称 *</label>
+        <input class="form-input" id="workName" placeholder="给作品起个名字" maxlength="80" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">作品描述</label>
+        <textarea class="form-textarea" id="workDesc" placeholder="描述你完成的作品、实现过程、最终效果..." rows="4"></textarea>
+      </div>
+      <div class="form-group">
+        <label class="form-label">作品链接（可选）</label>
+        <input class="form-input" id="workLink" placeholder="https://..." />
+      </div>
+      <div class="qa-actions">
+        <button class="btn btn-ghost" id="cancelConvertModal">取消</button>
+        <button class="btn btn-works" id="saveConvert">✦ 完成转化</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Notification -->
+<div class="notification" id="notification"></div>
+
+<script>
+// ===================== DATA LAYER =====================
+const DB_KEY = 'lingguang_v1';
+
+function loadDB() {
+  try {
+    const data = JSON.parse(localStorage.getItem(DB_KEY)) || { ideas: [], works: [], categories: [] };
+    if (!data.categories) data.categories = [];
+    return data;
+  } catch { return { ideas: [], works: [], categories: [] }; }
+}
+
+function saveDB(db) {
+  localStorage.setItem(DB_KEY, JSON.stringify(db));
+}
+
+function genId() {
+  return Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+}
+
+// ===================== STATE =====================
+let db = loadDB();
+let currentTab = 'ideas';
+let currentIdeaId = null;
+let editMode = false;
+let selectedEmotion = '💡';
+let searchQuery = '';
+let activeTagFilter = 'all';
+let worksSearchQuery = '';
+
+// ===================== UTILS =====================
+function formatDate(ts) {
+  const d = new Date(ts);
+  const now = new Date();
+  const diff = now - d;
+  if (diff < 60000) return '刚刚';
+  if (diff < 3600000) return Math.floor(diff / 60000) + ' 分钟前';
+  if (diff < 86400000) return Math.floor(diff / 3600000) + ' 小时前';
+  if (diff < 604800000) return Math.floor(diff / 86400000) + ' 天前';
+  return d.toLocaleDateString('zh-CN', { month: 'short', day: 'numeric' });
+}
+
+function fullDate(ts) {
+  return new Date(ts).toLocaleString('zh-CN', {
+    year: 'numeric', month: '2-digit', day: '2-digit',
+    hour: '2-digit', minute: '2-digit'
+  });
+}
+
+function escHtml(str) {
+  return String(str)
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function tagColorClass(tag) {
+  if (!tag) return '';
+  let hash = 0;
+  for (let c of tag) hash = (hash * 31 + c.charCodeAt(0)) & 0xffff;
+  return 'tag-' + (hash % 6);
+}
+
+function notify(msg, type = '') {
+  const el = document.getElementById('notification');
+  el.textContent = msg;
+  el.className = 'notification show' + (type ? ' ' + type : '');
+  clearTimeout(el._t);
+  el._t = setTimeout(() => el.classList.remove('show'), 2600);
+}
+
+// ===================== TAG DROPDOWN =====================
+// configs: { wrapId, inputId, panelId }
+const tagDropdowns = [
+  { wrapId: 'qaTagWrap',    inputId: 'qaTag',        panelId: 'qaTagPanel' },
+  { wrapId: 'modalTagWrap', inputId: 'modalIdeaTag', panelId: 'modalTagPanel' },
+  { wrapId: 'detailTagWrap',inputId: 'editTagInput', panelId: 'detailTagPanel' },
+];
+
+function ensureCategory(name) {
+  name = name.trim();
+  if (!name) return;
+  if (!db.categories.includes(name)) {
+    db.categories.push(name);
+    saveDB(db);
+  }
+}
+
+function removeCategory(name) {
+  db.categories = db.categories.filter(c => c !== name);
+  saveDB(db);
+}
+
+function renderTagPanel(cfg, query) {
+  const panel = document.getElementById(cfg.panelId);
+  const input = document.getElementById(cfg.inputId);
+  const q = (query !== undefined ? query : input.value).trim().toLowerCase();
+  const cats = db.categories.filter(c => !q || c.toLowerCase().includes(q));
+
+  let html = '';
+  if (cats.length) {
+    html += '<div class="tag-dropdown-list">' + cats.map(c => `
+      <div class="tag-dropdown-item${input.value.trim() === c ? ' selected' : ''}" data-val="${escHtml(c)}">
+        <span>${escHtml(c)}</span>
+        <button class="tag-dropdown-item-del" data-del="${escHtml(c)}" title="删除分类">✕</button>
+      </div>`).join('') + '</div>';
+  } else {
+    html += `<div class="tag-dropdown-empty">暂无分类</div>`;
+  }
+
+  const showCreate = input.value.trim() && !db.categories.includes(input.value.trim());
+  html += `<div class="tag-dropdown-create${showCreate ? '' : ' hidden'}" id="${cfg.panelId}_create">
+    <span>＋ 新建分类「${escHtml(input.value.trim())}」</span>
+  </div>`;
+
+  panel.innerHTML = html;
+
+  // Select existing
+  panel.querySelectorAll('.tag-dropdown-item').forEach(item => {
+    item.addEventListener('mousedown', e => {
+      if (e.target.classList.contains('tag-dropdown-item-del')) return;
+      e.preventDefault();
+      input.value = item.dataset.val;
+      closeTagPanel(cfg);
+    });
+  });
+
+  // Delete category
+  panel.querySelectorAll('.tag-dropdown-item-del').forEach(btn => {
+    btn.addEventListener('mousedown', e => {
+      e.preventDefault();
+      e.stopPropagation();
+      removeCategory(btn.dataset.del);
+      if (input.value.trim() === btn.dataset.del) input.value = '';
+      renderTagPanel(cfg);
+    });
+  });
+
+  // Create new
+  const createBtn = document.getElementById(cfg.panelId + '_create');
+  if (createBtn) {
+    createBtn.addEventListener('mousedown', e => {
+      e.preventDefault();
+      const val = input.value.trim();
+      if (val) { ensureCategory(val); renderTagPanel(cfg); closeTagPanel(cfg); }
+    });
+  }
+}
+
+function openTagPanel(cfg) {
+  document.getElementById(cfg.panelId).classList.add('open');
+  renderTagPanel(cfg);
+}
+
+function closeTagPanel(cfg) {
+  document.getElementById(cfg.panelId).classList.remove('open');
+}
+
+function initTagDropdown(cfg) {
+  const input = document.getElementById(cfg.inputId);
+  const wrap = document.getElementById(cfg.wrapId);
+
+  input.addEventListener('focus', () => openTagPanel(cfg));
+  input.addEventListener('input', () => renderTagPanel(cfg));
+  input.addEventListener('keydown', e => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      const val = input.value.trim();
+      if (val) { ensureCategory(val); closeTagPanel(cfg); }
+    }
+    if (e.key === 'Escape') closeTagPanel(cfg);
+  });
+  input.addEventListener('blur', () => {
+    // slight delay so mousedown on panel fires first
+    setTimeout(() => closeTagPanel(cfg), 150);
+  });
+
+  // Arrow toggle
+  const arrow = wrap.querySelector('.tag-dropdown-arrow');
+  if (arrow) {
+    arrow.addEventListener('mousedown', e => {
+      e.preventDefault();
+      const panel = document.getElementById(cfg.panelId);
+      if (panel.classList.contains('open')) { closeTagPanel(cfg); } else { input.focus(); openTagPanel(cfg); }
+    });
+  }
+}
+
+tagDropdowns.forEach(cfg => initTagDropdown(cfg));
+
+// Helper: get tag value and ensure saved
+function getTagValue(inputId) {
+  const val = document.getElementById(inputId).value.trim();
+  if (val) ensureCategory(val);
+  return val;
+}
+
+// ===================== RENDER =====================
+function getAllTags() {
+  const tags = new Set(db.categories);
+  db.ideas.forEach(i => { if (i.tag) tags.add(i.tag); });
+  return [...tags];
+}
+
+function renderFilterTags() {
+  const tags = getAllTags();
+  const container = document.getElementById('filterTags');
+  container.innerHTML = `<button class="filter-tag ${activeTagFilter === 'all' ? 'active' : ''}" data-tag="all">全部</button>`;
+  tags.forEach(tag => {
+    container.innerHTML += `<button class="filter-tag ${activeTagFilter === tag ? 'active' : ''}" data-tag="${escHtml(tag)}">${escHtml(tag)}</button>`;
+  });
+  container.querySelectorAll('.filter-tag').forEach(btn => {
+    btn.addEventListener('click', () => {
+      activeTagFilter = btn.dataset.tag;
+      renderFilterTags();
+      renderIdeas();
+    });
+  });
+}
+
+function getFilteredIdeas() {
+  let list = [...db.ideas].reverse();
+  if (activeTagFilter !== 'all') list = list.filter(i => i.tag === activeTagFilter);
+  if (searchQuery) {
+    const q = searchQuery.toLowerCase();
+    list = list.filter(i =>
+      i.title.toLowerCase().includes(q) ||
+      (i.content || '').toLowerCase().includes(q) ||
+      (i.tag || '').toLowerCase().includes(q)
+    );
+  }
+  return list;
+}
+
+function renderIdeas() {
+  const grid = document.getElementById('ideasGrid');
+  const ideas = getFilteredIdeas();
+  document.getElementById('ideasCount').textContent = db.ideas.length;
+
+  if (!ideas.length) {
+    const isFilter = searchQuery || activeTagFilter !== 'all';
+    grid.innerHTML = `
+      <div class="empty-state" style="grid-column:1/-1">
+        <div class="empty-icon">${isFilter ? '🔍' : '💡'}</div>
+        <div class="empty-title">${isFilter ? '没有匹配的灵感' : '还没有灵感'}</div>
+        <div class="empty-desc">${isFilter ? '换个关键词试试' : '凌晨三点的想法也值得被记录<br>用上方的快速记录开始吧'}</div>
+      </div>`;
+    return;
+  }
+
+  grid.innerHTML = ideas.map(idea => {
+    const converted = !!idea.workId;
+    const journeyCount = (idea.journey || []).length;
+    return `
+    <div class="idea-card ${converted ? 'converted' : ''}" data-id="${idea.id}">
+      <div class="card-header">
+        <div class="card-title">${escHtml(idea.title)}</div>
+        ${converted ? `<span class="card-badge badge-converted">已转化</span>` : ''}
+      </div>
+      ${idea.content ? `<div class="card-content">${escHtml(idea.content)}</div>` : ''}
+      <div class="card-footer">
+        <div class="card-meta">
+          <span class="card-date">${formatDate(idea.createdAt)}</span>
+          ${idea.tag ? `<span class="card-tag ${tagColorClass(idea.tag)}">${escHtml(idea.tag)}</span>` : ''}
+        </div>
+        <div class="card-stats">
+          ${journeyCount ? `<span class="card-stat">📝 ${journeyCount}</span>` : ''}
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+
+  grid.querySelectorAll('.idea-card').forEach(card => {
+    card.addEventListener('click', () => openDetail(card.dataset.id));
+  });
+}
+
+function renderWorks() {
+  const grid = document.getElementById('worksGrid');
+  let works = [...db.works].reverse();
+  document.getElementById('worksCount').textContent = works.length;
+  if (worksSearchQuery) {
+    const q = worksSearchQuery.toLowerCase();
+    works = works.filter(w =>
+      w.name.toLowerCase().includes(q) ||
+      (w.desc || '').toLowerCase().includes(q)
+    );
+  }
+
+  if (!works.length) {
+    grid.innerHTML = `
+      <div class="empty-state" style="grid-column:1/-1">
+        <div class="empty-icon">✦</div>
+        <div class="empty-title">还没有作品</div>
+        <div class="empty-desc">当你把一个灵感变成现实<br>在灵感详情页将其转化为作品</div>
+      </div>`;
+    return;
+  }
+
+  grid.innerHTML = works.map(work => {
+    const idea = db.ideas.find(i => i.id === work.ideaId);
+    return `
+    <div class="idea-card work-card" data-work-id="${work.id}">
+      <div class="card-header">
+        <div class="card-title">${escHtml(work.name)}</div>
+        <span class="card-badge" style="background:var(--works-light);color:var(--works)">作品</span>
+      </div>
+      ${work.desc ? `<div class="card-content">${escHtml(work.desc)}</div>` : ''}
+      <div class="card-footer">
+        <div class="card-meta">
+          <span class="card-date">${formatDate(work.createdAt)}</span>
+          ${idea?.tag ? `<span class="card-tag ${tagColorClass(idea.tag)}">${escHtml(idea.tag)}</span>` : ''}
+        </div>
+        ${work.link ? `<a class="work-link" href="${escHtml(work.link)}" target="_blank" onclick="event.stopPropagation()">🔗 查看</a>` : ''}
+      </div>
+    </div>`;
+  }).join('');
+
+  grid.querySelectorAll('.idea-card[data-work-id]').forEach(card => {
+    card.addEventListener('click', () => {
+      const work = db.works.find(w => w.id === card.dataset.workId);
+      if (work) {
+        const idea = db.ideas.find(i => i.id === work.ideaId);
+        if (idea) openDetail(idea.id);
+      }
+    });
+  });
+}
+
+function renderAll() {
+  renderFilterTags();
+  renderIdeas();
+  renderWorks();
+}
+
+// ===================== DETAIL MODAL =====================
+function openDetail(ideaId) {
+  currentIdeaId = ideaId;
+  const idea = db.ideas.find(i => i.id === ideaId);
+  if (!idea) return;
+
+  const converted = !!idea.workId;
+  const work = converted ? db.works.find(w => w.id === idea.workId) : null;
+
+  // Badge row
+  const badgeRow = document.getElementById('detailBadgeRow');
+  badgeRow.innerHTML = `
+    ${idea.tag ? `<span class="card-tag ${tagColorClass(idea.tag)}">${escHtml(idea.tag)}</span>` : ''}
+    ${converted ? `<span class="card-badge badge-converted">✦ 已转化为作品</span>` : `<span class="card-badge badge-idea">💡 灵感中</span>`}
+  `;
+
+  document.getElementById('detailTitle').textContent = idea.title;
+
+  // Meta
+  document.getElementById('detailMeta').innerHTML = `
+    <span class="meta-item">📅 ${fullDate(idea.createdAt)}</span>
+    ${idea.updatedAt ? `<span class="meta-item">✏️ 更新于 ${fullDate(idea.updatedAt)}</span>` : ''}
+    <span class="meta-item">📝 ${(idea.journey || []).length} 条心路</span>
+  `;
+
+  // Content
+  const contentEl = document.getElementById('detailContent');
+  contentEl.textContent = idea.content || '（暂无详细描述）';
+
+  // Work detail
+  const workDetailSection = document.getElementById('workDetailSection');
+  const workDetailContent = document.getElementById('workDetailContent');
+  if (converted && work) {
+    workDetailSection.style.display = '';
+    workDetailContent.innerHTML = `
+      <div class="work-detail-label">作品名称</div>
+      <div class="work-detail-text" style="margin-bottom:10px">${escHtml(work.name)}</div>
+      ${work.desc ? `<div class="work-detail-label">作品描述</div><div class="work-detail-text" style="margin-bottom:10px">${escHtml(work.desc)}</div>` : ''}
+      ${work.link ? `<div class="work-detail-label">作品链接</div><a class="work-link" href="${escHtml(work.link)}" target="_blank">🔗 ${escHtml(work.link)}</a>` : ''}
+    `;
+  } else {
+    workDetailSection.style.display = 'none';
+  }
+
+  // Journey
+  renderJourney(idea);
+
+  // Convert section
+  const convertArea = document.getElementById('convertArea');
+  if (converted && work) {
+    convertArea.innerHTML = `
+      <p style="color:var(--works)">✦ 此灵感已转化为《${escHtml(work.name)}》</p>
+    `;
+  } else {
+    convertArea.innerHTML = `
+      <p>将这个灵感转化为实际作品，记录你的成果</p>
+      <button class="btn btn-works btn-sm" id="openConvertModal">✦ 转化为作品</button>
+    `;
+    document.getElementById('openConvertModal').onclick = openConvertModal;
+  }
+
+  openModal('detailModal');
+}
+
+function renderJourney(idea) {
+  const list = document.getElementById('journeyList');
+  const entries = idea.journey || [];
+
+  if (!entries.length) {
+    list.innerHTML = `<div style="font-size:13px;color:var(--text-3);padding:12px 0;">还没有心路记录，记录你实现这个想法的过程吧</div>`;
+    return;
+  }
+
+  list.innerHTML = entries.map((entry, idx) => `
+    <div class="journey-item" data-idx="${idx}">
+      <div class="journey-timeline">
+        <div class="journey-dot"></div>
+        <div class="journey-line"></div>
+      </div>
+      <div class="journey-content">
+        <div class="journey-header">
+          <span class="journey-emotion">${entry.emotion || '💡'}</span>
+          <span class="journey-time">${fullDate(entry.ts)}</span>
+          <div class="journey-actions">
+            <button class="icon-btn delete-journey-btn" data-idx="${idx}" title="删除">🗑</button>
+          </div>
+        </div>
+        <div class="journey-text">${escHtml(entry.text)}</div>
+      </div>
+    </div>
+  `).join('');
+
+  list.querySelectorAll('.delete-journey-btn').forEach(btn => {
+    btn.addEventListener('click', () => deleteJourney(parseInt(btn.dataset.idx)));
+  });
+}
+
+function deleteJourney(idx) {
+  const idea = db.ideas.find(i => i.id === currentIdeaId);
+  if (!idea || !idea.journey) return;
+  idea.journey.splice(idx, 1);
+  saveDB(db);
+  renderJourney(idea);
+  renderIdeas();
+}
+
+// ===================== MODAL HELPERS =====================
+function openModal(id) {
+  document.getElementById(id).classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeModal(id) {
+  document.getElementById(id).classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+function closeAllModals() {
+  exitEditMode();
+  ['addModal', 'detailModal', 'convertModal'].forEach(closeModal);
+  document.body.style.overflow = '';
+}
+
+// Click overlay to close
+['addModal', 'convertModal'].forEach(id => {
+  document.getElementById(id).addEventListener('click', e => {
+    if (e.target.id === id) closeModal(id);
+  });
+});
+document.getElementById('detailModal').addEventListener('click', e => {
+  if (e.target.id === 'detailModal') { exitEditMode(); closeModal('detailModal'); }
+});
+
+// ===================== ADD / EDIT IDEA =====================
+function openAddModal(idea) {
+  editMode = !!idea;
+  document.getElementById('addModalTitle').textContent = idea ? '编辑灵感' : '记录新灵感';
+  document.getElementById('modalIdeaTitle').value = idea ? idea.title : '';
+  document.getElementById('modalIdeaContent').value = idea ? (idea.content || '') : '';
+  document.getElementById('modalIdeaTag').value = idea ? (idea.tag || '') : '';
+  openModal('addModal');
+  setTimeout(() => document.getElementById('modalIdeaTitle').focus(), 100);
+}
+
+document.getElementById('openAddModal').onclick = () => openAddModal(null);
+document.getElementById('fabBtn').onclick = () => openAddModal(null);
+document.getElementById('closeAddModal').onclick = () => closeModal('addModal');
+document.getElementById('cancelAddModal').onclick = () => closeModal('addModal');
+
+document.getElementById('saveIdea').onclick = () => {
+  const title = document.getElementById('modalIdeaTitle').value.trim();
+  if (!title) { notify('请填写灵感标题', 'error'); document.getElementById('modalIdeaTitle').focus(); return; }
+  const content = document.getElementById('modalIdeaContent').value.trim();
+  const tag = getTagValue('modalIdeaTag');
+
+  if (editMode && currentIdeaId) {
+    const idea = db.ideas.find(i => i.id === currentIdeaId);
+    if (idea) {
+      idea.title = title; idea.content = content; idea.tag = tag;
+      idea.updatedAt = Date.now();
+    }
+    saveDB(db); renderAll();
+    closeModal('addModal');
+    openDetail(currentIdeaId);
+    notify('灵感已更新 ✓', 'success');
+  } else {
+    const idea = { id: genId(), title, content, tag, createdAt: Date.now(), journey: [] };
+    db.ideas.push(idea);
+    saveDB(db); renderAll();
+    closeModal('addModal');
+    notify('灵感已保存 ⚡', 'success');
+  }
+};
+
+// Keyboard shortcut: Enter to save in title field
+document.getElementById('modalIdeaTitle').addEventListener('keydown', e => {
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); document.getElementById('saveIdea').click(); }
+});
+
+// Edit / Delete from detail
+function enterEditMode() {
+  const idea = db.ideas.find(i => i.id === currentIdeaId);
+  if (!idea) return;
+  // 填入当前值
+  document.getElementById('editTitleInput').value = idea.title;
+  document.getElementById('editContentInput').value = idea.content || '';
+  document.getElementById('editTagInput').value = idea.tag || '';
+  // 切换显示
+  document.getElementById('detailTitle').style.display = 'none';
+  document.getElementById('editTitleInput').style.display = '';
+  document.getElementById('detailContentSection').style.display = 'none';
+  document.getElementById('detailEditSection').style.display = '';
+  document.getElementById('journeySection').style.display = 'none';
+  document.getElementById('convertSection').style.display = 'none';
+  document.getElementById('detailViewActions').style.display = 'none';
+  document.getElementById('detailEditActions').style.display = 'flex';
+  setTimeout(() => document.getElementById('editTitleInput').focus(), 80);
+}
+
+function exitEditMode() {
+  document.getElementById('detailTitle').style.display = '';
+  document.getElementById('editTitleInput').style.display = 'none';
+  document.getElementById('detailContentSection').style.display = '';
+  document.getElementById('detailEditSection').style.display = 'none';
+  document.getElementById('journeySection').style.display = '';
+  document.getElementById('convertSection').style.display = '';
+  document.getElementById('detailViewActions').style.display = 'flex';
+  document.getElementById('detailEditActions').style.display = 'none';
+}
+
+document.getElementById('editIdeaBtn').onclick = () => enterEditMode();
+
+document.getElementById('cancelEditBtn').onclick = () => exitEditMode();
+
+document.getElementById('saveEditBtn').onclick = () => {
+  const title = document.getElementById('editTitleInput').value.trim();
+  if (!title) { notify('标题不能为空', 'error'); document.getElementById('editTitleInput').focus(); return; }
+  const content = document.getElementById('editContentInput').value.trim();
+  const tag = getTagValue('editTagInput');
+  const idea = db.ideas.find(i => i.id === currentIdeaId);
+  if (idea) {
+    idea.title = title; idea.content = content; idea.tag = tag;
+    idea.updatedAt = Date.now();
+  }
+  saveDB(db); renderAll();
+  exitEditMode();
+  openDetail(currentIdeaId);
+  notify('已保存 ✓', 'success');
+};
+
+document.getElementById('deleteIdeaBtn').onclick = () => {
+  if (!confirm('确认删除这条灵感？相关心路历程也将一并删除。')) return;
+  const idea = db.ideas.find(i => i.id === currentIdeaId);
+  if (idea?.workId) {
+    db.works = db.works.filter(w => w.id !== idea.workId);
+  }
+  db.ideas = db.ideas.filter(i => i.id !== currentIdeaId);
+  saveDB(db); renderAll();
+  closeModal('detailModal');
+  notify('已删除');
+};
+
+document.getElementById('closeDetailModal').onclick = () => { exitEditMode(); closeModal('detailModal'); };
+
+// ===================== QUICK ADD =====================
+document.getElementById('qaSave').onclick = () => {
+  const title = document.getElementById('qaTitle').value.trim();
+  if (!title) { notify('请填写灵感标题', 'error'); document.getElementById('qaTitle').focus(); return; }
+  const content = document.getElementById('qaContent').value.trim();
+  const tag = getTagValue('qaTag');
+  const idea = { id: genId(), title, content, tag, createdAt: Date.now(), journey: [] };
+  db.ideas.push(idea);
+  saveDB(db);
+  document.getElementById('qaTitle').value = '';
+  document.getElementById('qaContent').value = '';
+  document.getElementById('qaTag').value = '';
+  renderAll();
+  notify('灵感已保存 ⚡', 'success');
+  document.getElementById('qaTitle').focus();
+};
+
+document.getElementById('qaClear').onclick = () => {
+  document.getElementById('qaTitle').value = '';
+  document.getElementById('qaContent').value = '';
+  document.getElementById('qaTag').value = '';
+  document.getElementById('qaTitle').focus();
+};
+
+// Enter in quick title
+document.getElementById('qaTitle').addEventListener('keydown', e => {
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); document.getElementById('qaContent').focus(); }
+});
+
+// ===================== JOURNEY =====================
+// Emotion picker
+document.getElementById('emotionPicker').querySelectorAll('.emotion-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.emotion-btn').forEach(b => b.classList.remove('selected'));
+    btn.classList.add('selected');
+    selectedEmotion = btn.dataset.emotion;
+  });
+});
+// Default select first
+document.querySelector('.emotion-btn[data-emotion="💡"]').classList.add('selected');
+
+document.getElementById('saveJourney').onclick = () => {
+  const text = document.getElementById('journeyInput').value.trim();
+  if (!text) { notify('请填写心路内容', 'error'); document.getElementById('journeyInput').focus(); return; }
+  const idea = db.ideas.find(i => i.id === currentIdeaId);
+  if (!idea) return;
+  if (!idea.journey) idea.journey = [];
+  idea.journey.push({ text, emotion: selectedEmotion, ts: Date.now() });
+  idea.updatedAt = Date.now();
+  saveDB(db);
+  document.getElementById('journeyInput').value = '';
+  renderJourney(idea);
+  renderIdeas();
+  notify('心路已记录 📝', 'success');
+};
+
+// ===================== CONVERT TO WORK =====================
+function openConvertModal() {
+  const idea = db.ideas.find(i => i.id === currentIdeaId);
+  if (!idea) return;
+  document.getElementById('workName').value = idea.title;
+  document.getElementById('workDesc').value = '';
+  document.getElementById('workLink').value = '';
+  openModal('convertModal');
+  setTimeout(() => document.getElementById('workName').focus(), 100);
+}
+
+document.getElementById('closeConvertModal').onclick = () => closeModal('convertModal');
+document.getElementById('cancelConvertModal').onclick = () => closeModal('convertModal');
+
+document.getElementById('saveConvert').onclick = () => {
+  const name = document.getElementById('workName').value.trim();
+  if (!name) { notify('请填写作品名称', 'error'); document.getElementById('workName').focus(); return; }
+  const desc = document.getElementById('workDesc').value.trim();
+  const link = document.getElementById('workLink').value.trim();
+
+  const work = { id: genId(), ideaId: currentIdeaId, name, desc, link, createdAt: Date.now() };
+  db.works.push(work);
+
+  const idea = db.ideas.find(i => i.id === currentIdeaId);
+  if (idea) {
+    idea.workId = work.id;
+    idea.updatedAt = Date.now();
+    if (!idea.journey) idea.journey = [];
+    idea.journey.push({ text: `🎉 灵感已转化为作品《${name}》`, emotion: '🎉', ts: Date.now() });
+  }
+
+  saveDB(db); renderAll();
+  closeModal('convertModal');
+  openDetail(currentIdeaId);
+  notify('恭喜！灵感已成功转化为作品 ✦', 'success');
+};
+
+// ===================== TABS =====================
+document.querySelectorAll('.tab-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    currentTab = btn.dataset.tab;
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('ideasPanel').style.display = currentTab === 'ideas' ? '' : 'none';
+    document.getElementById('worksPanel').style.display = currentTab === 'works' ? '' : 'none';
+  });
+});
+
+// ===================== SEARCH =====================
+document.getElementById('searchInput').addEventListener('input', e => {
+  searchQuery = e.target.value;
+  renderIdeas();
+});
+
+document.getElementById('worksSearch').addEventListener('input', e => {
+  worksSearchQuery = e.target.value;
+  renderWorks();
+});
+
+// ===================== KEYBOARD SHORTCUTS =====================
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') closeAllModals();
+  // Ctrl/Cmd + N: new idea
+  if ((e.ctrlKey || e.metaKey) && e.key === 'n') {
+    e.preventDefault();
+    openAddModal(null);
+  }
+});
+
+// ===================== INIT =====================
+renderAll();
+</script>
+</body>
+</html>
